@@ -93,5 +93,38 @@ do {
 }
 while (indexArray.length < numberCards);
 
+let clickCount = 0;
+let clickArray = [];
+
+let children = $('#cards').children();
+
+for (let child of children) {
+    child.addEventListener('click', function() {
+        if (clickCount === 0) {
+            clickCount ++;
+            clickArray.push(child);
+        } else if (clickCount === 1) {
+            clickCount ++;
+            clickArray.push(child);
+            if (clickArray[0].src === clickArray[1].src) {
+                clickArray[0].src = 'images/blank.png';
+                clickArray[1].src = 'images/blank.png';
+                clickArray = [];
+                clickCount = 0;
+            } else {
+                setTimeout(function() {
+                    clickArray[0].src = 'images/back.png';
+                    clickArray[1].src = 'images/back.png';
+                    clickArray = [];
+                    clickCount = 0;
+                }, 1000);
+            }
+        } 
+        else {
+            clickCount = 0;
+            clickArray = [];
+        }
+    });
+}
 // push comment
 // I got green line
