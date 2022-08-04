@@ -116,9 +116,12 @@ let clickArray = [];
 // create array to store displayed cards
 let children = $('#cards').children();
 
+
 // for each card displayed on the page, add a click event listener
 for (let i= 0; i < children.length; i++) {
+
     children[i].addEventListener('click', function() {
+
         // if no card has been clicked yet, increment clickCount
         if (clickCount === 0) {
             clickCount ++;
@@ -126,6 +129,7 @@ for (let i= 0; i < children.length; i++) {
             children[i].src = imagesArray[indexArray[i]].src;
             // push the card value to the clickArray
             clickArray.push(children[i]);
+
         } else if (clickCount === 1) { 
             // if a card has already been clicked, increment clickCount
             clickCount ++;
@@ -136,6 +140,7 @@ for (let i= 0; i < children.length; i++) {
 
             // if the two card values are the same, remove them from the page by changing their src to blank.png
             if (clickArray[0].src === clickArray[1].src) {
+
                 setTimeout(function() {
                     clickArray[0].src = 'images/blank.png';
                     clickArray[1].src = 'images/blank.png';
@@ -144,6 +149,7 @@ for (let i= 0; i < children.length; i++) {
                     clickArray = [];
                     clickCount = 0;
                 }, 1000);
+
             } else {
                 // if the two cards are different, change their src to back.png over a second
                 setTimeout(function() {
@@ -157,6 +163,7 @@ for (let i= 0; i < children.length; i++) {
         } 
         else {
             // if two cards have already been clicked, reset clickCount and clickArray
+            console.log(clickCount);
             clickCount = 0;
             clickArray = [];
         }
