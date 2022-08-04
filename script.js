@@ -73,14 +73,16 @@ $('#player_name').val(playerName);
 $('#player').text(playerName);
 
 // create image array
-const imagesArray = [];
+let indexArray = [];
+let imagesArray = [];
 
-// populate imagesArray with the number of 
-// cards specified by user in settings
-for (let i = 0; i < numberCards; i++) {
-    const image = new Image(); // create image object
-    image.src = cardsArray[i]; // set image source from cardsArray
-    imagesArray.push(image); // push image to imagesArray
+const setImages = () => {
+    do { let randomNumber = randomIndex();
+        if (!indexArray.includes(randomNumber)) {
+           imagesArray.push(cardsArray[randomNumber]);
+           indexArray.push(randomNumber);
+       };
+   } while (imagesArray.length < numberCards);
 }
 
 // random index generator between 0 
@@ -96,70 +98,102 @@ for (let i = 0; i < numberCards; i++) {
     $('#cards').append(backCard); // append back card to cards div
 }
 
-// create empty array to store random indexes
-let indexArray = [];
-
-// generate random indexes and push them to indexArray until
-// indexArray has the same number of elements as imagesArray
-do {
-    let randomNum = randomIndex();
-    if (!indexArray.includes(randomNum)) {
-        indexArray.push(randomNum);
-    }
-}
-while (indexArray.length < numberCards);
-
 // create click counter and array to store clicked card values
 let clickCount = 0;
 let clickArray = [];
 
 // create array to store displayed cards
 let children = $('#cards').children();
+setImages();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // for each card displayed on the page, add a click event listener
-for (let i= 0; i < children.length; i++) {
-    children[i].addEventListener('click', function() {
-        // if no card has been clicked yet, increment clickCount
-        if (clickCount === 0) {
-            clickCount ++;
-            // set back card image to the random image number at the same index in the indexArray
-            children[i].src = imagesArray[indexArray[i]].src;
-            // push the card value to the clickArray
-            clickArray.push(children[i]);
-        } else if (clickCount === 1) { 
-            // if a card has already been clicked, increment clickCount
-            clickCount ++;
-            // set back card image to the random image number at the same index in the indexArray
-            children[i].src = imagesArray[indexArray[i]].src;
-            // push the card value to the clickArray
-            clickArray.push(children[i]);
+// for (let i= 0; i < children.length; i++) {
+//     children[i].addEventListener('click', function() {
+//         // on click if no card has been clicked yet, increment clickCount by 1
+//         if (clickCount === 0) {
+//             clickCount ++;
+//             // set back card image to the random image number at the same index in the indexArray
+//             children[i].src = imagesArray[indexArray[i]].src;
+//             // push the card value to the clickArray
+//             clickArray.push(children[i]);
+//         } else if (clickCount === 1) { 
+//             // if a card has already been clicked, increment clickCount
+//             clickCount ++;
+//             // set back card image to the random image number at the same index in the indexArray
+//             children[i].src = imagesArray[indexArray[i]].src;
+//             // push the card value to the clickArray
+//             clickArray.push(children[i]);
 
-            // if the two card values are the same, remove them from the page by changing their src to blank.png
-            if (clickArray[0].src === clickArray[1].src) {
-                setTimeout(function() {
-                    clickArray[0].src = 'images/blank.png';
-                    clickArray[1].src = 'images/blank.png';
+//             // if the two card values are the same, remove them from the page by changing their src to blank.png
+//             if (clickArray[0].src === clickArray[1].src) {
+//                 setTimeout(function() {
+//                     clickArray[0].src = 'images/blank.png';
+//                     clickArray[1].src = 'images/blank.png';
                     
-                    // reset clickCount and clickArray
-                    clickArray = [];
-                    clickCount = 0;
-                }, 1000);
-            } else {
-                // if the two cards are different, change their src to back.png over a second
-                setTimeout(function() {
-                    clickArray[0].src = 'images/back.png';
-                    clickArray[1].src = 'images/back.png';
-                    // reset clickCount and clickArray
-                    clickArray = [];
-                    clickCount = 0;
-                }, 1000);
-            }
-        } 
-        else {
-            // if two cards have already been clicked, reset clickCount and clickArray
-            clickCount = 0;
-            clickArray = [];
-        }
+//                     // reset clickCount and clickArray
+//                     clickArray = [];
+//                     clickCount = 0;
+//                 }, 1000);
+//             } else {
+//                 // if the two cards are different, change their src to back.png over a second
+//                 setTimeout(function() {
+//                     clickArray[0].src = 'images/back.png';
+//                     clickArray[1].src = 'images/back.png';
+//                     // reset clickCount and clickArray
+//                     clickArray = [];
+//                     clickCount = 0;
+//                 }, 1000);
+//             }
+//         } 
+//         else {
+//             // if two cards have already been clicked, reset clickCount and clickArray
+//             clickCount = 0;
+//             clickArray = [];
+//         }
 
-    });
-}
+//     });
+// }
