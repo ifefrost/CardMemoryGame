@@ -71,8 +71,10 @@ let numberCards = sessionStorage.getItem('numberCards');
 let playerName = sessionStorage.getItem('playerName');
 $('#player_name').val(playerName);
 $('#player').text(playerName);
+
 // create image array
 const imagesArray = [];
+
 // populate imagesArray with the number of 
 // cards specified by user in settings
 for (let i = 0; i < numberCards; i++) {
@@ -87,16 +89,22 @@ function randomIndex() {
     return Math.floor(Math.random() * numberCards);
 };
 
-let indexArray = []; // create empty array to store random indexes
+// display a back card for each card to be displayed in the game
+for (let i = 0; i < numberCards; i++) {
+    let backCard = new Image(); // create image object for blank card
+    backCard.src = 'images/back.png'; // set image source to back card 
+    $('#cards').append(backCard); // append back card to cards div
+}
+
+// create empty array to store random indexes
+let indexArray = [];
 
 // generate random indexes and push them to indexArray until
 // indexArray has the same number of elements as imagesArray
 do {
     let randomNum = randomIndex();
     if (!indexArray.includes(randomNum)) {
-        let card = imagesArray[randomNum];
         indexArray.push(randomNum);
-        $('#cards').append(card);
     }
 }
 while (indexArray.length < numberCards);
@@ -109,23 +117,33 @@ let clickArray = [];
 let children = $('#cards').children();
 
 // for each card displayed on the page, add a click event listener
-for (let child of children) {
-    child.addEventListener('click', function() {
-        // if no card has been clicked yet, increment clickCount and add card value to clickArray
+for (let i= 0; i < children.length; i++) {
+    children[i].addEventListener('click', function() {
+        // if no card has been clicked yet, increment clickCount
         if (clickCount === 0) {
             clickCount ++;
-            clickArray.push(child);
+            // set back card image to the random image number at the same index in the indexArray
+            children[i].src = imagesArray[indexArray[i]].src;
+            // push the card value to the clickArray
+            clickArray.push(children[i]);
         } else if (clickCount === 1) { 
-            // if a card has already been clicked, increment clickCount and add card value to clickArray
+            // if a card has already been clicked, increment clickCount
             clickCount ++;
-            clickArray.push(child);
-            // if the two cards are the same, remove them from the page by changing their src to blank.png
+            // set back card image to the random image number at the same index in the indexArray
+            children[i].src = imagesArray[indexArray[i]].src;
+            // push the card value to the clickArray
+            clickArray.push(children[i]);
+
+            // if the two card values are the same, remove them from the page by changing their src to blank.png
             if (clickArray[0].src === clickArray[1].src) {
-                clickArray[0].src = 'images/blank.png';
-                clickArray[1].src = 'images/blank.png';
-                // reset clickCount and clickArray
-                clickArray = [];
-                clickCount = 0;
+                setTimeout(function() {
+                    clickArray[0].src = 'images/blank.png';
+                    clickArray[1].src = 'images/blank.png';
+                    
+                    // reset clickCount and clickArray
+                    clickArray = [];
+                    clickCount = 0;
+                }, 1000);
             } else {
                 // if the two cards are different, change their src to back.png over a second
                 setTimeout(function() {
@@ -145,5 +163,3 @@ for (let child of children) {
 
     });
 }
-
-// testing my commit from my new init on my new laptop
