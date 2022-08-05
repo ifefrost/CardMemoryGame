@@ -14,11 +14,13 @@ $('#save_settings').click(function() {
 
 // ------------------------------------------------------------
 
-// getting player name and number of cards from session storage
+// getting player name, high score and number of cards from session storage
 let numberCards = sessionStorage.getItem('numberCards');
 let playerName = sessionStorage.getItem('playerName');
+let highScore = sessionStorage.getItem('highScore');
 $('#player_name').val(playerName);
 $('#player').text(playerName);
+$('#high_score').text(highScore);
 
 // ------------------------------------------------------------
 
@@ -74,8 +76,9 @@ $('#cards').append(backCards); // append back cards to game board
 
 let clickCount = 0; // count the number of clicks
 let clickArray = []; // array to compare the cards clicked
-let gamePoints = 0; // count the game points
-
+let blankCards = 0; // count the cards out of play
+let successCount = 0; // count the successsful mathches
+let failCount = 0; // count the unsuccessful mathches
 let children = $('#cards').children(); // array of cards displayed in the game
 
 // ------------------------------------------------------------
@@ -94,11 +97,26 @@ function changeBack (image, card1, card2) {
 
 // game over check and display
 function gameOverCheck() {
-    if (gamePoints == numberCards) {
+    if (blankCards == numberCards) {
         setTimeout(() => {
             document.getElementById('game-over').classList.remove('hidden');
             document.getElementById('cards').classList.add('hidden');
-        }, "1000")
+        }, "1000");
+        let correct = parseInt($('#correct').text());
+        if(highScore < correct) {
+            highScore = correct;
+            sessionStorage.setItem('highScore', highScore);
+        }
+    }
+}   
+
+// Success percentage check and display
+function correctPercentage() {
+    let successPercent = (successCount / (successCount+failCount)) * 100
+    if (isNaN(successPercent)) {
+        $('#correct').text('0%');
+    } else {
+        $('#correct').text(`${successPercent.toFixed()}%`);
     }
 }
 
@@ -136,21 +154,22 @@ $('#cards').on('click', 'img', function() {
                 if (randomizedCardArray[clickArray[0]] === randomizedCardArray[clickArray[1]] && clickArray[0] !== clickArray[1]) {
                     console.log('match');
                     changeBack('images/blank.png', clickArray[0], clickArray[1]);
-                    gamePoints += 2;
-                    console.log(gamePoints);
+                    blankCards += 2;
+                    successCount++;
 
                 // if cards do not match, display blank card and reset click counter and array
                 } else {
                     console.log('no match');
                     changeBack('images/back.png', clickArray[0], clickArray[1]);
+                    failCount++;
                 }
-
+                correctPercentage(); // display the correct percentage
         } else {
             clickCount = 0;
             clickArray = [];
         }
     }
-
+    
     gameOverCheck();
 
 });
