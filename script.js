@@ -26,7 +26,7 @@ $('#player').text(playerName);
 
 const cardsArray = []; // an array of all card images
 let indexArray = []; // an index of random indexes for the cards
-let cardBackArray = []; // array of image src for the flip side of cards
+let randomizedCardArray = []; // array of image src for the flip side of cards
 const backCards = []; // an array of back card images
 
 // ------------------------------------------------------------
@@ -49,12 +49,12 @@ function randomIndex() {
 do { 
     let randomNumber = randomIndex();
     if (!indexArray.includes(randomNumber)) {
-        cardBackArray.push(cardsArray[randomNumber]);
+        randomizedCardArray.push(cardsArray[randomNumber]);
         indexArray.push(randomNumber);
     };
-} while (cardBackArray.length < numberCards);
+} while (randomizedCardArray.length < numberCards);
 
-console.log(cardBackArray);
+console.log(randomizedCardArray);
 
 // ------------------------------------------------------------
 
@@ -123,17 +123,17 @@ $('#cards').on('click', 'img', function() {
             clickArray[clickCount] = card;
             clickCount++;
             // change the image source of the clicked card to the card image
-            $(this).attr('src', cardBackArray[card]);
+            $(this).attr('src', randomizedCardArray[card]);
 
         // if click count is 1 run the following code
         } else if (clickCount === 1) {
             clickArray[clickCount] = card;
             clickCount++;
             // change the image source of the clicked card to the card image
-            $(this).attr('src', cardBackArray[card]); 
+            $(this).attr('src', randomizedCardArray[card]); 
 
                 // if cards match, display blank card and reset click counter and array
-                if (cardBackArray[clickArray[0]] === cardBackArray[clickArray[1]] && clickArray[0] !== clickArray[1]) {
+                if (randomizedCardArray[clickArray[0]] === randomizedCardArray[clickArray[1]] && clickArray[0] !== clickArray[1]) {
                     console.log('match');
                     changeBack('images/blank.png', clickArray[0], clickArray[1]);
                     gamePoints += 2;
