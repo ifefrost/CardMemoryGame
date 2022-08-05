@@ -13,77 +13,35 @@ $('#save_settings').click(function() {
 });
 
 // an array of all card images
-const cardsArray = [
-    'images/card_1.png',
-    'images/card_1.png',
-    'images/card_2.png',
-    'images/card_2.png',
-    'images/card_3.png',
-    'images/card_3.png',
-    'images/card_4.png',
-    'images/card_4.png',
-    'images/card_5.png',
-    'images/card_5.png',
-    'images/card_6.png',
-    'images/card_6.png',
-    'images/card_7.png',
-    'images/card_7.png',
-    'images/card_8.png',
-    'images/card_8.png',
-    'images/card_9.png',
-    'images/card_9.png',
-    'images/card_10.png',
-    'images/card_10.png',
-    'images/card_11.png',
-    'images/card_11.png',
-    'images/card_12.png',
-    'images/card_12.png',
-    'images/card_13.png',
-    'images/card_13.png',
-    'images/card_14.png',
-    'images/card_14.png',
-    'images/card_15.png',
-    'images/card_15.png',
-    'images/card_16.png',
-    'images/card_16.png',
-    'images/card_17.png',
-    'images/card_17.png',
-    'images/card_18.png',
-    'images/card_18.png',
-    'images/card_19.png',
-    'images/card_19.png',
-    'images/card_20.png',
-    'images/card_20.png',
-    'images/card_21.png',
-    'images/card_21.png',
-    'images/card_22.png',
-    'images/card_22.png',
-    'images/card_23.png',
-    'images/card_23.png',
-    'images/card_24.png',
-    'images/card_24.png',
-    'images/back.png',
-    'images/blank.png'
-];
+const cardsArray = [];
+// push 2 of each card image to array
+for (let i = 1; i < 48; i++) {
+    cardsArray.push(`images/card_${i}.png`);
+    cardsArray.push(`images/card_${i}.png`);
+};
 
-
+// getting player name and number of cards from session storage
 let numberCards = sessionStorage.getItem('numberCards');
 let playerName = sessionStorage.getItem('playerName');
 $('#player_name').val(playerName);
 $('#player').text(playerName);
 
-// create image array
+// create image array for back of cards
 let indexArray = [];
-let imagesArray = [];
+let cardBackArray = [];
 
 const setImages = () => {
     do { let randomNumber = randomIndex();
         if (!indexArray.includes(randomNumber)) {
-           imagesArray.push(cardsArray[randomNumber]);
+           cardBackArray.push(cardsArray[randomNumber]);
            indexArray.push(randomNumber);
        };
-   } while (imagesArray.length < numberCards);
+   } while (cardBackArray.length < numberCards);
 }
+
+setImages();
+
+console.log(cardBackArray);
 
 // random index generator between 0 
 // and number of cards specified by user in settings
@@ -91,12 +49,14 @@ function randomIndex() {
     return Math.floor(Math.random() * numberCards);
 };
 
+const backCards = [];
 // display a back card for each card to be displayed in the game
 for (let i = 0; i < numberCards; i++) {
-    let backCard = new Image(); // create image object for blank card
-    backCard.src = 'images/back.png'; // set image source to back card 
-    $('#cards').append(backCard); // append back card to cards div
+    backCards[i] = new Image(); // create image object for blank card
+    backCards[i].src = 'images/back.png'; // set image source to back card
+    backCards[i].setAttribute('id', i); // set id to index of card in array
 }
+$('#cards').append(backCards); // append back cards to game board
 
 // create click counter and array to store clicked card values
 let clickCount = 0;
@@ -104,97 +64,78 @@ let clickArray = [];
 
 // create array to store displayed cards
 let children = $('#cards').children();
-setImages();
+
+let gameOver = 0;
+
+// when user clicks a card this function is called
+$('#cards').on('click', 'img', function() {
+
+    // get the image source of the clicked card
+    let cardSRC = this.src;
+    cardSRC = cardSRC.split("1/").pop();
+    // get the id of the clicked card
+    let card = this.id;
+
+    // if the card is not blank run the following code
+    if (cardSRC != 'images/blank.png') {
+
+        // if click count is 0 run the following code
+        if (clickCount === 0) {
+            clickArray[clickCount] = card;
+            clickCount++;
+            // change the image source of the clicked card to the card image
+            $(this).attr('src', cardBackArray[card]);
+
+        // if click count is 1 run the following code
+        } else if (clickCount === 1) {
+            clickArray[clickCount] = card;
+            clickCount++;
+            // change the image source of the clicked card to the card image
+            $(this).attr('src', cardBackArray[card]); 
+
+                // if cards match, display blank card and reset click counter and array
+                if (cardBackArray[clickArray[0]] === cardBackArray[clickArray[1]] && clickArray[0] !== clickArray[1]) {
+                    console.log('match');
+                    changeBack('images/blank.png', clickArray[0], clickArray[1]);
+                    gameOver += 2;
+                    console.log(gameOver);
+
+                // if cards do not match, display blank card and reset click counter and array
+                } else {
+                    console.log('no match');
+                    changeBack('images/back.png', clickArray[0], clickArray[1]);
+                }
+
+        } else {
+            clickCount = 0;
+            clickArray = [];
+        }
+    }
+
+    gameOverCheck();
+
+});
+
+// change the image source of the card to blank or back card
+function changeBack (image, card1, card2) {
+    setTimeout(() => {
+        children[card1].src = image;
+        children[card2].src = image;
+        clickCount = 0;
+        clickArray = [];
+    }, "1000")
+}
+
+// game over check and display
+function gameOverCheck() {
+    if (gameOver == numberCards) {
+        setTimeout(() => {
+            document.getElementById('game-over').classList.remove('hidden');
+            document.getElementById('cards').classList.add('hidden');
+        }, "1000")
+    }
+}
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// for each card displayed on the page, add a click event listener
-// for (let i= 0; i < children.length; i++) {
-//     children[i].addEventListener('click', function() {
-//         // on click if no card has been clicked yet, increment clickCount by 1
-//         if (clickCount === 0) {
-//             clickCount ++;
-//             // set back card image to the random image number at the same index in the indexArray
-//             children[i].src = imagesArray[indexArray[i]].src;
-//             // push the card value to the clickArray
-//             clickArray.push(children[i]);
-//         } else if (clickCount === 1) { 
-//             // if a card has already been clicked, increment clickCount
-//             clickCount ++;
-//             // set back card image to the random image number at the same index in the indexArray
-//             children[i].src = imagesArray[indexArray[i]].src;
-//             // push the card value to the clickArray
-//             clickArray.push(children[i]);
-
-//             // if the two card values are the same, remove them from the page by changing their src to blank.png
-//             if (clickArray[0].src === clickArray[1].src) {
-//                 setTimeout(function() {
-//                     clickArray[0].src = 'images/blank.png';
-//                     clickArray[1].src = 'images/blank.png';
-                    
-//                     // reset clickCount and clickArray
-//                     clickArray = [];
-//                     clickCount = 0;
-//                 }, 1000);
-//             } else {
-//                 // if the two cards are different, change their src to back.png over a second
-//                 setTimeout(function() {
-//                     clickArray[0].src = 'images/back.png';
-//                     clickArray[1].src = 'images/back.png';
-//                     // reset clickCount and clickArray
-//                     clickArray = [];
-//                     clickCount = 0;
-//                 }, 1000);
-//             }
-//         } 
-//         else {
-//             // if two cards have already been clicked, reset clickCount and clickArray
-//             clickCount = 0;
-//             clickArray = [];
-//         }
-
-//     });
-// }

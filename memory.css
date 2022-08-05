@@ -24,11 +24,24 @@ input, select {
 input[type=checkbox] { 
     width: 2em;
 }
-header p {
-	margin: 0 2em 1em 0;
+
+button {
+    cursor: pointer;
+    background-color: blue;
+    color: white;
+    font-weight: 700;
+    border: none;
+    padding: 1em;
+    border-radius: 10px;
 }
+
+button:hover {
+    background-color: #0573e1;
+}
+
 #new_game, #player, #high_score, #correct {
 	float: left;
+    margin-right: 1em;
 }
 #cards {
     overflow: auto;
@@ -43,4 +56,8 @@ header p {
 }
 .clear {
     clear: both;
+}
+
+.hidden {
+    display: none;
 }
