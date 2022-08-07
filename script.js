@@ -88,11 +88,35 @@ let children = $('#cards').children(); // array of cards displayed in the game
 // change the image source of the card to blank or back card
 function changeBack (image, card1, card2) {
     setTimeout(() => {
-        children[card1].src = image;
-        children[card2].src = image;
+        // change the image source of the card to back card with fade animations
+        if (image == 'images/back.png') {
+
+            children.eq(card1).fadeOut(500, function() {
+                children[card1].src = image;
+                children.eq(card1).fadeIn(500);
+            });
+
+            children.eq(card2).fadeOut(500, function() {
+                children[card2].src = image;
+                children.eq(card2).fadeIn(500);
+            });
+        }
+        // change the image source of the card to blank card with fade/slide animations
+        if (image == 'images/blank.png') {
+
+            children.eq(card1).animate({ height: "toggle" }, 500, function() {
+                children[card1].src = image;
+                children.eq(card1).animate({ height: "toggle" }, 500);
+            });
+
+            children.eq(card2).animate({ height: "toggle" }, 500, function() {
+                children[card2].src = image;
+                children.eq(card2).animate({ height: "toggle" }, 500);
+            });
+        }
         clickCount = 0;
         clickArray = [];
-    }, "1000")
+    }, "2000")
 }
 
 // game over check and display
@@ -101,7 +125,7 @@ function gameOverCheck() {
         setTimeout(() => {
             document.getElementById('game-over').classList.remove('hidden');
             document.getElementById('cards').classList.add('hidden');
-        }, "1000");
+        }, "3000");
         let correct = parseInt($('#correct').text());
         if(highScore < correct) {
             highScore = correct;
@@ -140,15 +164,23 @@ $('#cards').on('click', 'img', function() {
         if (clickCount === 0) {
             clickArray[clickCount] = card;
             clickCount++;
+
             // change the image source of the clicked card to the card image
-            $(this).attr('src', randomizedCardArray[card]);
+            $(this).fadeOut(500, function() {
+                $(this).attr('src', randomizedCardArray[card]);
+                $(this).fadeIn(500);
+            });
 
         // if click count is 1 run the following code
         } else if (clickCount === 1) {
             clickArray[clickCount] = card;
             clickCount++;
+
             // change the image source of the clicked card to the card image
-            $(this).attr('src', randomizedCardArray[card]); 
+            $(this).fadeOut(500, function() {
+                $(this).attr('src', randomizedCardArray[card]);
+                $(this).fadeIn(500);
+            });
 
                 // if cards match, display blank card and reset click counter and array
                 if (randomizedCardArray[clickArray[0]] === randomizedCardArray[clickArray[1]] && clickArray[0] !== clickArray[1]) {
