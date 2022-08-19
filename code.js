@@ -22,14 +22,14 @@ class Game {
         this.cards = [];
         this.cardsInPlay = [];
         this.index = [];
-        this.score = 0;
-        this.matches = 0;
+        this.successCount = 0;
         this.attempts = 0;
-        this.gameOver = false;
+        this.percent = 0;
         this.createCards();
         this.shuffleCards();
         this.createBoard();
-        //this.createScoreBoard();
+        this.scoreBoard();
+        this.gameOver();
     }
 
     // create the cards
@@ -61,48 +61,47 @@ class Game {
     // create the board
     createBoard() {
         const board = document.getElementById("cards");
+        const game_over = document.getElementById("game-over");
+        board.classList.remove("hidden");
+        game_over.classList.add("hidden");
         board.innerHTML = "";
         for (let i = 0; i < this.cards.length; i++) {
             const backCard = new Image();
             const card = document.createElement("div");
             card.classList.add("card");
-            card.dataset.index = i;
             backCard.src = this.cards[i].back;
             backCard.setAttribute('id', i);
             card.appendChild(backCard);
             card.addEventListener("click", this.flipCard.bind(this));
             board.appendChild(card);
-            console.log("card added");
         }
     }
 
     // create the score board
-    createScoreBoard() {
-        // const scoreBoard = document.getElementById("scoreBoard");
-        // scoreBoard.innerHTML = "";
-        // const score = document.createElement("div");
-        // score.id = "score";
-        // score.innerHTML = "Score: " + this.score;
-        // scoreBoard.appendChild(score);
-        // const matches = document.createElement("div");
-        // matches.id = "matches";
-        // matches.innerHTML = "Matches: " + this.matches;
-        // scoreBoard.appendChild(matches);
-        // const attempts = document.createElement("div");
-        // attempts.id = "attempts";
-        // attempts.innerHTML = "Attempts: " + this.attempts;
-        // scoreBoard.appendChild(attempts);
+    scoreBoard() {
+        const playerName = document.getElementById("player");
+        playerName.innerHTML = sessionStorage.getItem('playerName');
+        const percentCorrect = document.getElementById("correct");
+        this.percent = ((this.successCount / this.attempts) * 100).toFixed();
+
+        if (isNaN(this.percent)) {
+            percentCorrect.innerHTML = "0%";
+        } else {
+            percentCorrect.innerHTML = `${this.percent}%`;
+        }
+       
     }
 
     // flip the card
     flipCard(event) {
-        if (this.gameOver) {
-            return;
-        }
-        if (this.cardsInPlay.length < 2) {
+        if (this.cardsInPlay.length < 2 && !event.target.src.includes("blank.png")) {
             const index = event.target;
             const card = this.cards[index.id];
-            event.target.src = card.image;
+
+            $(`#${index.id}`).fadeOut(500, function() {
+                event.target.src = card.image;
+                $(`#${index.id}`).fadeIn(500);
+            });
             this.cardsInPlay.push(card);
             this.index.push(index);
             
@@ -115,50 +114,78 @@ class Game {
     // check for a match
     checkForMatch() {
         this.attempts++;
-        const board = document.getElementById("cards");
+
         if (this.cardsInPlay[0].name === this.cardsInPlay[1].name) {
-            this.matches++;
-            this.score += 10;
 
-            setTimeout(() => {
-            board.children[this.index[0].id].firstChild.src = 'images/blank.png';
-            board.children[this.index[1].id].firstChild.src = 'images/blank.png';
-            this.cardsInPlay = [];
-            this.index = [];
-            }, 1000);
-
-
-            if (this.matches === 8) {
-                this.gameOver = true;
-            }
-            
+            this.successCount++;
+            setTimeout(this.flipCardsBack.bind(this, 'images/blank.png'), 2000);
             
         } else {
-            this.score -= 5;
-            setTimeout(this.flipCardsBack.bind(this), 1000);
+            setTimeout(this.flipCardsBack.bind(this, 'images/back.png'), 2000);
         }
-        this.createScoreBoard();
+
+        this.scoreBoard();
+
     }
 
     // flip the cards back
-    flipCardsBack() {
-        const board = document.getElementById("cards");
-        board.children[this.index[0].id].firstChild.src = 'images/back.png';
-        board.children[this.index[1].id].firstChild.src = 'images/back.png';
-        this.cardsInPlay = [];
+    flipCardsBack(card) {
+
+        const firstID = this.index[0].id;
+        const secondID = this.index[1].id;
+
+        if (card === 'images/blank.png') {
+            const board = document.getElementById("cards");
+
+            $(`#${this.index[0].id}`).animate({ height: "toggle" }, 500, function() {
+                board.children[firstID].firstChild.src = card;
+                $(`#${firstID}`).animate({ height: "toggle" }, 500);
+            });
+
+            
+            $(`#${this.index[1].id}`).animate({ height: "toggle" }, 500, function() {
+                board.children[secondID].firstChild.src = card;
+                $(`#${secondID}`).animate({ height: "toggle" }, 500);
+            });
+
+            setTimeout(() => {
+                this.gameOver();
+            }, 6000);
+
+        } 
+        if (card === 'images/back.png') {
+            const board = document.getElementById("cards");
+
+            $(`#${firstID}`).fadeOut(500, function() {
+                board.children[firstID].firstChild.src = card;
+                $(`#${firstID}`).delay(200).fadeIn(500);
+            });
+
+            $(`#${secondID}`).fadeOut(500, function() {
+                board.children[secondID].firstChild.src = card;
+                $(`#${secondID}`).delay(200).fadeIn(500);
+            });
+            
+        }
+
         this.index = [];
+        this.cardsInPlay = [];
     }
 
-    // reset the game
-    resetGame() {
-        this.cardsInPlay = [];
-        this.score = 0;
-        this.matches = 0;
-        this.attempts = 0;
-        this.gameOver = false;
-        this.shuffleCards();
-        this.createBoard();
-       // this.createScoreBoard();
+    gameOver() {
+        if (this.successCount === (this.cards.length / 2)) {
+
+            const board = document.getElementById("cards");
+            const game_over = document.getElementById("game-over");
+            board.classList.add("hidden");
+            game_over.classList.remove("hidden");
+
+            if (this.percent > sessionStorage.getItem('highscore')) {
+                sessionStorage.setItem('highscore', this.percent);
+                const highScore = document.getElementById("high_score");
+                highScore.innerHTML = `${this.percent}%`;
+            }
+        }
     }
 }
 
@@ -167,16 +194,16 @@ $('#save_settings').click(function() {
     const numberCards = $('#num_cards').val();
     sessionStorage.setItem('playerName', playerName);
     sessionStorage.setItem('numberCards', numberCards);
-    location.reload();
+    new Game();
+    $("#tabs").tabs('option', 'active', 0);
 });
 
 // create a new game onclick
 $("#new_game").click(function() {
-    new Game();
+    if (sessionStorage.getItem('numberCards') !== null) {
+        new Game();
+    }
 });
-
-
-
 
 
 
