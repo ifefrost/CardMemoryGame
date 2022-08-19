@@ -14,10 +14,6 @@ class Card {
         this.back = 'images/back.png';
     }
 
-    getBack() {
-        return this.back;
-    }
-
 }
 
 // create a class for the game
@@ -45,7 +41,7 @@ class Game {
             cardNames.push(`card_${i}`);
         };
        
-        for (let i = 0; i < cardNames.length; i++) {
+        for (let i = 0; i < (sessionStorage.getItem('numberCards'))/2; i++) {
             const card1 = new Card(cardNames[i], cardImages[i]);
             const card2 = new Card(cardNames[i], cardImages[i]);
             this.cards.push(card1);
@@ -103,14 +99,16 @@ class Game {
         if (this.gameOver) {
             return;
         }
-        const index = event.target;
-        const card = this.cards[index.id];
-        event.target.src = card.image;
-        this.cardsInPlay.push(card);
-        this.index.push(index);
-        
-        if (this.cardsInPlay.length === 2 && this.index[0].id != this.index[1].id) {
-            this.checkForMatch();
+        if (this.cardsInPlay.length < 2) {
+            const index = event.target;
+            const card = this.cards[index.id];
+            event.target.src = card.image;
+            this.cardsInPlay.push(card);
+            this.index.push(index);
+            
+            if (this.cardsInPlay.length === 2 && this.index[0].id != this.index[1].id) {
+                this.checkForMatch();
+            }
         }
     }
 
@@ -122,11 +120,14 @@ class Game {
             this.matches++;
             this.score += 10;
 
+            setTimeout(() => {
             board.children[this.index[0].id].firstChild.src = 'images/blank.png';
             board.children[this.index[1].id].firstChild.src = 'images/blank.png';
-
             this.cardsInPlay = [];
             this.index = [];
+            }, 1000);
+
+
             if (this.matches === 8) {
                 this.gameOver = true;
             }
@@ -160,6 +161,14 @@ class Game {
        // this.createScoreBoard();
     }
 }
+
+$('#save_settings').click(function() {
+    const playerName = $('#player_name').val();
+    const numberCards = $('#num_cards').val();
+    sessionStorage.setItem('playerName', playerName);
+    sessionStorage.setItem('numberCards', numberCards);
+    location.reload();
+});
 
 // create a new game onclick
 $("#new_game").click(function() {
