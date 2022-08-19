@@ -12,15 +12,10 @@ class Card {
         this.name = name;
         this.image = image;
         this.back = 'images/back.png';
-        this.blank = 'images/blank.png';
     }
 
     getBack() {
         return this.back;
-    }
-
-    getBlank() {
-        return this.blank;
     }
 
 }
@@ -56,7 +51,6 @@ class Game {
             this.cards.push(card1);
             this.cards.push(card2);
         }
-        console.log("cards", this.cards);
     }
 
     // shuffle the cards
@@ -65,7 +59,6 @@ class Game {
             const r = Math.floor(Math.random() * (i + 1));
             [this.cards[i], this.cards[r]] = [this.cards[r], this.cards[i]];
         }
-        console.log("shuffled");
     }
 
 
@@ -115,7 +108,8 @@ class Game {
         event.target.src = card.image;
         this.cardsInPlay.push(card);
         this.index.push(index);
-        if (this.cardsInPlay.length === 2) {
+        
+        if (this.cardsInPlay.length === 2 && this.index[0].id != this.index[1].id) {
             this.checkForMatch();
         }
     }
@@ -123,14 +117,16 @@ class Game {
     // check for a match
     checkForMatch() {
         this.attempts++;
+        const board = document.getElementById("cards");
         if (this.cardsInPlay[0].name === this.cardsInPlay[1].name) {
             this.matches++;
             this.score += 10;
 
-            console.log(this.cards[this.index[0].id]);
+            board.children[this.index[0].id].firstChild.src = 'images/blank.png';
+            board.children[this.index[1].id].firstChild.src = 'images/blank.png';
 
-            console.log(this.cardsInPlay);
             this.cardsInPlay = [];
+            this.index = [];
             if (this.matches === 8) {
                 this.gameOver = true;
             }
@@ -146,11 +142,10 @@ class Game {
     // flip the cards back
     flipCardsBack() {
         const board = document.getElementById("cards");
-        for (let i = 0; i < board.children.length; i++) {
-            board.children[i].firstChild.src = this.cards[i].back;
-            console.log(board.children[i]);
-        }
+        board.children[this.index[0].id].firstChild.src = 'images/back.png';
+        board.children[this.index[1].id].firstChild.src = 'images/back.png';
         this.cardsInPlay = [];
+        this.index = [];
     }
 
     // reset the game
