@@ -150,7 +150,7 @@ class Game {
 
             setTimeout(() => {
                 this.gameOver();
-            }, 6000);
+            }, 5000);
 
         } 
         if (card === 'images/back.png') {
@@ -202,6 +202,8 @@ $('#save_settings').click(function() {
 $("#new_game").click(function() {
     if (sessionStorage.getItem('numberCards') !== null) {
         new Game();
+    } else {
+        alert("Please set your settings first");
     }
 });
 
