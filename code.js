@@ -204,6 +204,7 @@ $("#new_game").click(function() {
         new Game();
     } else {
         alert("Please set your settings first");
+        $("#tabs").tabs('option', 'active', 2);
     }
 });
 
